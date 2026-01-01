@@ -24,7 +24,7 @@ Créez les fichiers suivants dans le dossier `.github/workflows/` de votre proje
 Créez `.github/workflows/oc-flash.yml` :
 
 ```yaml
-name: OpenCode (Flash)
+name: OpenCode (Gemini 3 Flash)
 on:
   issue_comment:
     types: [created]
@@ -42,7 +42,7 @@ jobs:
 Créez `.github/workflows/oc-pro.yml` :
 
 ```yaml
-name: OpenCode (Pro)
+name: OpenCode (Gemini 3 Pro)
 on:
   issue_comment:
     types: [created]
@@ -60,7 +60,7 @@ jobs:
 Créez `.github/workflows/oc-opus.yml` :
 
 ```yaml
-name: OpenCode (Opus)
+name: OpenCode (Opus 4.5)
 on:
   issue_comment:
     types: [created]

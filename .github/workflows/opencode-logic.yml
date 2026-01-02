@@ -29,11 +29,11 @@ jobs:
 
           # Model mapping - add new models here
           if [[ "$COMMENT" == *"/oc-opus-4.5"* ]]; then
-            MODEL="anthropic/claude-opus-4.5"
+            MODEL="opencode/claude-opus-4.5"
           elif [[ "$COMMENT" == *"/oc-gemini-3-pro"* ]]; then
-            MODEL="google/gemini-3-pro"
+            MODEL="opencode/gemini-3-pro"
           elif [[ "$COMMENT" == *"/oc-gemini-3-flash"* ]]; then
-            MODEL="google/gemini-3-flash"
+            MODEL="opencode/gemini-3-flash"
           fi
 
           if [ -z "$MODEL" ]; then
@@ -51,5 +51,6 @@ jobs:
         uses: sst/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           model: ${{ steps.parse.outputs.model }}

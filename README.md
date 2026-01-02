@@ -33,7 +33,8 @@ jobs:
     uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
     with:
       model: google/gemini-3-flash
-    secrets: inherit
+    secrets:
+      OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
 ```
 
 #### 🧠 Mode Standard (Gemini 3 Pro)
@@ -51,7 +52,8 @@ jobs:
     uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
     with:
       model: google/gemini-3-pro
-    secrets: inherit
+    secrets:
+      OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
 ```
 
 #### 💎 Mode Expert (Claude Opus 4.5)
@@ -69,7 +71,8 @@ jobs:
     uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
     with:
       model: anthropic/claude-opus-4.5
-    secrets: inherit
+    secrets:
+      OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
 ```
 
 ## 🎮 Comment utiliser l'IA ?

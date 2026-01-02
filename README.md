@@ -10,10 +10,9 @@ Pour activer l'IA sur un autre dépôt de l'organisation (ex: mon-app, mon-api),
 
 ### 1. Pré-requis (Secrets)
 
-Assurez-vous que les secrets suivants sont configurés dans le dépôt (ou hérités de l'organisation) :
+Assurez-vous que le secret suivant est configuré dans le dépôt (ou hérité de l'organisation) :
 
-- `GOOGLE_API_KEY`
-- `ANTHROPIC_API_KEY`
+- `OPENCODE_API_KEY` (Obtenu via [OpenCode Zen](https://opencode.ai/docs/zen/))
 
 ### 2. Ajouter les Déclencheurs
 

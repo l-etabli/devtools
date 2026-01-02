@@ -29,7 +29,7 @@ jobs:
 
           # Model mapping - add new models here
           if [[ "$COMMENT" == *"/oc-opus-4.5"* ]]; then
-            MODEL="opencode/claude-opus-4.5"
+            MODEL="opencode/claude-opus-4-5"
           elif [[ "$COMMENT" == *"/oc-gemini-3-pro"* ]]; then
             MODEL="opencode/gemini-3-pro"
           elif [[ "$COMMENT" == *"/oc-gemini-3-flash"* ]]; then
@@ -46,14 +46,6 @@ jobs:
 
       - name: Checkout repo
         uses: actions/checkout@v4
-
-      - name: Verify OIDC
-        run: |
-          if [ -z "$ACTIONS_ID_TOKEN_REQUEST_URL" ]; then
-            echo "::error::ACTIONS_ID_TOKEN_REQUEST_URL is not set. OIDC is not available."
-            exit 1
-          fi
-          echo "OIDC is available."
 
       - name: Run OpenCode
         uses: sst/opencode/github@latest

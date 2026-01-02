@@ -13,6 +13,10 @@ on:
 jobs:
   trigger:
     if: contains(github.event.comment.body, 'oc-gemini-3-flash')
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
     with:
       model: google/gemini-3-flash
@@ -30,6 +34,10 @@ on:
 jobs:
   trigger:
     if: contains(github.event.comment.body, 'oc-gemini-3-pro')
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
     with:
       model: google/gemini-3-pro
@@ -47,6 +55,10 @@ on:
 jobs:
   trigger:
     if: contains(github.event.comment.body, 'oc-opus-4.5')
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
     with:
       model: anthropic/claude-opus-4.5

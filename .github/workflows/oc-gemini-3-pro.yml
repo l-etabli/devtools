@@ -7,6 +7,10 @@ on:
 jobs:
   trigger:
     if: contains(github.event.comment.body, 'oc-gemini-3-pro')
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
     with:
       model: google/gemini-3-pro

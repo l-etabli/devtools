@@ -1,111 +1,87 @@
-# 🤖 OpenCode Shared Workflows
+# OpenCode Shared Workflows
 
-Ce dépôt centralise la configuration et la logique des agents IA (OpenCode) via **OpenCode Zen** pour l'organisation l-etabli.
+Centralized AI agent (OpenCode) configuration for l-etabli organization.
 
-Il permet de maintenir une logique unique ("Moteur") et de l'appeler facilement depuis n'importe quel autre projet de l'organisation via des workflows "satellites". La couche Zen permet d'utiliser n'importe quel modèle (Anthropic, Google, etc.) avec une seule clé API.
+Single reusable workflow that handles all models. Add new models in one place - all repos get them automatically.
 
-## 🚀 Installation rapide sur un autre projet
+## Quick Install
 
-Pour ajouter les workflows OpenCode (Flash, Pro & Opus) sur un projet existant :
-
-1. Assurez-vous d'avoir le secret `OPENCODE_API_KEY` configuré dans le dépôt cible (ou hérité de l'organisation)
-2. Placez-vous à la racine du projet cible
-3. Lancez cette commande (nécessite [GitHub CLI](https://cli.github.com/)) :
+Requires `OPENCODE_API_KEY` secret in target repo (or org-level).
 
 ```bash
 gh api repos/l-etabli/devtools/contents/setup-opencode-workflows.sh -q .content | base64 -d | bash
 ```
 
-Cette commande crée automatiquement les 3 workflows dans `.github/workflows/`.
+Creates `.github/workflows/opencode.yml` - a single stable workflow that never needs updating.
 
----
+## Manual Install
 
-## 📖 Installation manuelle (alternative)
-
-Si vous préférez créer les fichiers manuellement, créez les fichiers suivants dans `.github/workflows/` :
-
-<details>
-<summary>⚡️ Mode Rapide (Gemini 3 Flash)</summary>
-
-Créez `.github/workflows/oc-gemini-3-flash.yml` :
+Create `.github/workflows/opencode.yml`:
 
 ```yaml
-name: OpenCode (Gemini 3 Flash)
+name: OpenCode
+
 on:
   issue_comment:
     types: [created]
+
 jobs:
-  call-flash:
-    if: contains(github.event.comment.body, 'oc-gemini-3-flash')
+  run:
+    if: contains(github.event.comment.body, '/oc-')
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
     uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
     with:
-      model: google/gemini-3-flash
+      comment: ${{ github.event.comment.body }}
     secrets:
       OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
 ```
 
-</details>
+## Usage
 
-<details>
-<summary>🧠 Mode Standard (Gemini 3 Pro)</summary>
+Comment on any Issue or PR with a trigger keyword:
 
-Créez `.github/workflows/oc-gemini-3-pro.yml` :
-
-```yaml
-name: OpenCode (Gemini 3 Pro)
-on:
-  issue_comment:
-    types: [created]
-jobs:
-  call-pro:
-    if: contains(github.event.comment.body, 'oc-gemini-3-pro')
-    uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
-    with:
-      model: google/gemini-3-pro
-    secrets:
-      OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
-```
-
-</details>
-
-<details>
-<summary>💎 Mode Expert (Claude Opus 4.5)</summary>
-
-Créez `.github/workflows/oc-opus-4-5.yml` :
-
-```yaml
-name: OpenCode (Opus 4.5)
-on:
-  issue_comment:
-    types: [created]
-jobs:
-  call-opus:
-    if: contains(github.event.comment.body, 'oc-opus-4.5')
-    uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
-    with:
-      model: anthropic/claude-opus-4.5
-    secrets:
-      OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
-```
-
-</details>
-
-## 🎮 Comment utiliser l'IA ?
-
-Une fois installé, allez dans n'importe quelle Issue ou Pull Request et mentionnez l'équipe correspondante. Utilisez l'autocomplétion GitHub (`@...`) pour choisir votre modèle.
-
-| Commande (Autocomplétion) | Modèle | Cas d'usage |
+| Trigger | Model | Use Case |
 | :--- | :--- | :--- |
-| `@l-etabli/oc-gemini-3-flash` | Gemini 3 Flash | Docs, Typos, Tests simples. Rapide et peu coûteux. |
-| `@l-etabli/oc-gemini-3-pro` | Gemini 3 Pro | Features standard. Le bon équilibre pour le code quotidien. |
-| `@l-etabli/oc-opus-4.5` | Claude Opus 4.5 | Architecture & Refacto. Pour les tâches complexes nécessitant un raisonnement profond. |
+| `/oc-gemini-3-flash` | Gemini 3 Flash | Quick tasks, docs, typos |
+| `/oc-gemini-3-pro` | Gemini 3 Pro | Standard features, daily coding |
+| `/oc-opus-4.5` | Claude Opus 4.5 | Complex architecture, deep reasoning |
 
-### Exemples de Prompts
+### Examples
 
-- **Pour corriger une fonction :** `@l-etabli/oc-gemini-3-flash Peux-tu ajouter une gestion d'erreur try/catch autour de cet appel API ?`
-- **Pour générer de la documentation :** `@l-etabli/oc-gemini-3-pro Écris la JSDoc pour toutes les fonctions de ce fichier, en expliquant les paramètres.`
-- **Pour une refonte d'architecture :** `@l-etabli/oc-opus-4.5 Analyse la structure actuelle du dossier /services. Propose une refonte utilisant le pattern Repository pour découpler la base de données.`
+```
+/oc-gemini-3-flash Add error handling to this function
+/oc-gemini-3-pro Write tests for the auth module
+/oc-opus-4.5 Refactor this service using the Repository pattern
+```
 
-## 🛠 Maintenance
+## Adding a New Model
 
-Toute la logique d'exécution se trouve dans le fichier `.github/workflows/opencode-logic.yml` de ce dépôt. En modifiant ce fichier, tous les projets de l'organisation utiliseront immédiatement la nouvelle version.
+Edit `.github/workflows/opencode-logic.yml` in this repo only:
+
+```bash
+# In the "Parse model from comment" step, add:
+elif [[ "$COMMENT" == *"/oc-new-model"* ]]; then
+  MODEL="provider/model-name"
+```
+
+All repos using this workflow will automatically have access to the new model.
+
+## Architecture
+
+```
+Your Repo                          devtools repo
+┌─────────────────┐               ┌─────────────────────────┐
+│ opencode.yml    │──────────────▶│ opencode-logic.yml      │
+│ (stable, never  │   passes      │ - parses trigger        │
+│  changes)       │   comment     │ - maps to model         │
+└─────────────────┘               │ - runs OpenCode         │
+                                  └─────────────────────────┘
+```
+
+## Maintenance
+
+All logic lives in `opencode-logic.yml`. Changes here apply to all repos immediately.

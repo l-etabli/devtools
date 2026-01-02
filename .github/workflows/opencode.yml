@@ -1,12 +1,12 @@
-name: OpenCode Gemini 3 Flash
+name: OpenCode
 
 on:
   issue_comment:
     types: [created]
 
 jobs:
-  trigger:
-    if: contains(github.event.comment.body, 'oc-gemini-3-flash')
+  run:
+    if: contains(github.event.comment.body, '/oc-')
     permissions:
       contents: write
       issues: write
@@ -14,6 +14,6 @@ jobs:
       id-token: write
     uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
     with:
-      model: google/gemini-3-flash
+      comment: ${{ github.event.comment.body }}
     secrets:
       OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}

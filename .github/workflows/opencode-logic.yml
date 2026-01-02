@@ -1,12 +1,12 @@
-name: OpenCode Engine (Zen Logic)
+name: OpenCode Engine
 
 on:
   workflow_call:
     inputs:
-      model:
+      comment:
         required: true
         type: string
-        description: "Le modèle LLM à utiliser"
+        description: "The issue comment body containing the trigger keyword"
     secrets:
       OPENCODE_API_KEY:
         required: true
@@ -21,16 +21,35 @@ jobs:
       id-token: write
 
     steps:
+      - name: Parse model from comment
+        id: parse
+        run: |
+          COMMENT="${{ inputs.comment }}"
+          MODEL=""
+
+          # Model mapping - add new models here
+          if [[ "$COMMENT" == *"/oc-opus-4.5"* ]]; then
+            MODEL="anthropic/claude-opus-4.5"
+          elif [[ "$COMMENT" == *"/oc-gemini-3-pro"* ]]; then
+            MODEL="google/gemini-3-pro"
+          elif [[ "$COMMENT" == *"/oc-gemini-3-flash"* ]]; then
+            MODEL="google/gemini-3-flash"
+          fi
+
+          if [ -z "$MODEL" ]; then
+            echo "::error::No matching model found in comment. Use: /oc-gemini-3-flash, /oc-gemini-3-pro, or /oc-opus-4.5"
+            exit 1
+          fi
+
+          echo "model=$MODEL" >> $GITHUB_OUTPUT
+          echo "Selected model: $MODEL"
+
       - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Run OpenCode
         uses: sst/opencode/github@latest
         env:
-          # PLUS BESOIN des clés Google/Anthropic individuelles
-          # Une seule clé pour gouverner tous les modèles via OpenCode Zen
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
         with:
-          # Tu passes toujours le modèle spécifique (ex: anthropic/claude-opus-4.5)
-          # Zen se charge de router la requête vers le bon fournisseur
-          model: ${{ inputs.model }}
+          model: ${{ steps.parse.outputs.model }}

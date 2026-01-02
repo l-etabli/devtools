@@ -47,6 +47,15 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Fetch central agent rules
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/l-etabli/devtools/main/AGENTS.md -o AGENTS.md.central
+          if [ -f AGENTS.md ]; then
+            echo -e "\n\n# Project Specific Rules\n" >> AGENTS.md.central
+            cat AGENTS.md >> AGENTS.md.central
+          fi
+          mv AGENTS.md.central AGENTS.md
+
       - name: Run OpenCode
         uses: sst/opencode/github@latest
         env:

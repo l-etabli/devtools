@@ -4,23 +4,30 @@ Ce dépôt centralise la configuration et la logique des agents IA (OpenCode) vi
 
 Il permet de maintenir une logique unique ("Moteur") et de l'appeler facilement depuis n'importe quel autre projet de l'organisation via des workflows "satellites". La couche Zen permet d'utiliser n'importe quel modèle (Anthropic, Google, etc.) avec une seule clé API.
 
-## 🚀 Installation dans un nouveau projet
+## 🚀 Installation rapide sur un autre projet
 
-Pour activer l'IA sur un autre dépôt de l'organisation (ex: mon-app, mon-api), suivez ces deux étapes.
+Pour ajouter les workflows OpenCode (Flash, Pro & Opus) sur un projet existant :
 
-### 1. Pré-requis (Secrets)
+1. Assurez-vous d'avoir le secret `OPENCODE_API_KEY` configuré dans le dépôt cible (ou hérité de l'organisation)
+2. Placez-vous à la racine du projet cible
+3. Lancez cette commande (nécessite [GitHub CLI](https://cli.github.com/)) :
 
-Assurez-vous que le secret suivant est configuré dans le dépôt (ou hérité de l'organisation) :
+```bash
+gh api repos/l-etabli/devtools/contents/setup-opencode-workflows.sh -q .content | base64 -d | bash
+```
 
-- `OPENCODE_API_KEY` (Obtenu via [OpenCode Zen](https://opencode.ai/docs/zen/))
+Cette commande crée automatiquement les 3 workflows dans `.github/workflows/`.
 
-### 2. Ajouter les Déclencheurs
+---
 
-Créez les fichiers suivants dans le dossier `.github/workflows/` de votre projet. Ils font le pont vers ce dépôt central.
+## 📖 Installation manuelle (alternative)
 
-#### ⚡️ Mode Rapide (Gemini 3 Flash)
+Si vous préférez créer les fichiers manuellement, créez les fichiers suivants dans `.github/workflows/` :
 
-Créez `.github/workflows/oc-flash.yml` :
+<details>
+<summary>⚡️ Mode Rapide (Gemini 3 Flash)</summary>
+
+Créez `.github/workflows/oc-gemini-3-flash.yml` :
 
 ```yaml
 name: OpenCode (Gemini 3 Flash)
@@ -37,9 +44,12 @@ jobs:
       OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
 ```
 
-#### 🧠 Mode Standard (Gemini 3 Pro)
+</details>
 
-Créez `.github/workflows/oc-pro.yml` :
+<details>
+<summary>🧠 Mode Standard (Gemini 3 Pro)</summary>
+
+Créez `.github/workflows/oc-gemini-3-pro.yml` :
 
 ```yaml
 name: OpenCode (Gemini 3 Pro)
@@ -56,9 +66,12 @@ jobs:
       OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
 ```
 
-#### 💎 Mode Expert (Claude Opus 4.5)
+</details>
 
-Créez `.github/workflows/oc-opus.yml` :
+<details>
+<summary>💎 Mode Expert (Claude Opus 4.5)</summary>
+
+Créez `.github/workflows/oc-opus-4-5.yml` :
 
 ```yaml
 name: OpenCode (Opus 4.5)
@@ -74,6 +87,8 @@ jobs:
     secrets:
       OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
 ```
+
+</details>
 
 ## 🎮 Comment utiliser l'IA ?
 

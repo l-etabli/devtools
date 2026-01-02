@@ -44,17 +44,6 @@ jobs:
           echo "model=$MODEL" >> $GITHUB_OUTPUT
           echo "Selected model: $MODEL"
 
-      - name: React to comment
-        run: |
-          gh api \
-            --method POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            /repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions \
-            -f "content=eyes"
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
       - name: Checkout repo
         uses: actions/checkout@v4
 

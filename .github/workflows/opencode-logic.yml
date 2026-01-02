@@ -1,4 +1,4 @@
-name: OpenCode Engine (Logic)
+name: OpenCode Engine (Zen Logic)
 
 on:
   workflow_call:
@@ -23,6 +23,10 @@ jobs:
       - name: Run OpenCode
         uses: sst/opencode/github@latest
         env:
+          # PLUS BESOIN des clés Google/Anthropic individuelles
+          # Une seule clé pour gouverner tous les modèles via OpenCode Zen
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
         with:
+          # Tu passes toujours le modèle spécifique (ex: anthropic/claude-opus-4.5)
+          # Zen se charge de router la requête vers le bon fournisseur
           model: ${{ inputs.model }}

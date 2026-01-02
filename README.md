@@ -1,8 +1,8 @@
 # 🤖 OpenCode Shared Workflows
 
-Ce dépôt centralise la configuration et la logique des agents IA (OpenCode) pour l'organisation l-etabli.
+Ce dépôt centralise la configuration et la logique des agents IA (OpenCode) via **OpenCode Zen** pour l'organisation l-etabli.
 
-Il permet de maintenir une logique unique ("Moteur") et de l'appeler facilement depuis n'importe quel autre projet de l'organisation via des workflows "satellites".
+Il permet de maintenir une logique unique ("Moteur") et de l'appeler facilement depuis n'importe quel autre projet de l'organisation via des workflows "satellites". La couche Zen permet d'utiliser n'importe quel modèle (Anthropic, Google, etc.) avec une seule clé API.
 
 ## 🚀 Installation dans un nouveau projet
 

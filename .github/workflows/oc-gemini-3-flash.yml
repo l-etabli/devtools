@@ -1,0 +1,14 @@
+name: OpenCode Gemini 3 Flash
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  trigger:
+    if: contains(github.event.comment.body, 'oc-gemini-3-flash')
+    uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
+    with:
+      model: google/gemini-3-flash
+    secrets:
+      OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}

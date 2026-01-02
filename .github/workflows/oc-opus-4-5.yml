@@ -1,0 +1,14 @@
+name: OpenCode Claude Opus 4.5
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  trigger:
+    if: contains(github.event.comment.body, 'oc-opus-4.5')
+    uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
+    with:
+      model: anthropic/claude-opus-4.5
+    secrets:
+      OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}

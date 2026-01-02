@@ -47,6 +47,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Verify OIDC
+        run: |
+          if [ -z "$ACTIONS_ID_TOKEN_REQUEST_URL" ]; then
+            echo "::error::ACTIONS_ID_TOKEN_REQUEST_URL is not set. OIDC is not available."
+            exit 1
+          fi
+          echo "OIDC is available."
+
       - name: Run OpenCode
         uses: sst/opencode/github@latest
         env:

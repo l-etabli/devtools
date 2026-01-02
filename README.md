@@ -46,6 +46,7 @@ Comment on any Issue or PR with a trigger keyword:
 
 | Trigger | Model | Use Case |
 | :--- | :--- | :--- |
+| `/oc-help` | - | List all available models |
 | `/oc-gemini-3-flash` | Gemini 3 Flash | Quick tasks, docs, typos |
 | `/oc-gemini-3-pro` | Gemini 3 Pro | Standard features, daily coding |
 | `/oc-opus-4.5` | Claude Opus 4.5 | Complex architecture, deep reasoning |
@@ -53,6 +54,10 @@ Comment on any Issue or PR with a trigger keyword:
 ### Examples
 
 ```
+/oc-help
+/oc-gemini-3-flash Add error handling to this function
+```
+
 /oc-gemini-3-flash Add error handling to this function
 /oc-gemini-3-pro Write tests for the auth module
 /oc-opus-4.5 Refactor this service using the Repository pattern

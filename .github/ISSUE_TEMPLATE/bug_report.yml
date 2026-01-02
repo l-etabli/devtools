@@ -1,0 +1,33 @@
+name: 🐛 Bug Report
+description: Report a problem with the OpenCode workflows.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please provide a clear and concise description of the bug.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened?
+    validations:
+      required: true
+  - type: input
+    id: repo_url
+    attributes:
+      label: Repository URL
+      description: Where did the error occur? (if applicable)
+  - type: input
+    id: run_url
+    attributes:
+      label: Action Run URL
+      description: Link to the failed GitHub Action run.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this?
+    validations:
+      required: true

@@ -1,0 +1,37 @@
+name: 🚀 New Model Request
+description: Propose a new AI model to be added to OpenCode.
+title: "[Model]: "
+labels: ["new-model", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new model! Adding a model here makes it available across the entire organization.
+  - type: input
+    id: model_name
+    attributes:
+      label: Model Name
+      placeholder: "e.g., Claude 3.5 Sonnet"
+    validations:
+      required: true
+  - type: input
+    id: trigger_keyword
+    attributes:
+      label: Requested Trigger Keyword
+      placeholder: "e.g., /oc-claude-3-5"
+    validations:
+      required: true
+  - type: input
+    id: provider_mapping
+    attributes:
+      label: OpenCode Model Identifier
+      placeholder: "e.g., opencode/claude-3-5-sonnet"
+    validations:
+      required: true
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use Case
+      description: Why should we add this model?
+    validations:
+      required: true

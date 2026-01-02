@@ -25,5 +25,7 @@ jobs:
       OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
 EOF
 
-echo "OpenCode workflow installed successfully!"
-echo "Available triggers: /oc-gemini-3-flash, /oc-gemini-3-pro, /oc-opus-4.5"
+echo "✅ OpenCode workflow installed successfully at .github/workflows/opencode.yml"
+echo "💡 Remember to set the OPENCODE_API_KEY secret in your repository or organization settings."
+echo "🚀 Available triggers: /oc-gemini-3-flash, /oc-gemini-3-pro, /oc-opus-4.5"
+echo "❓ Type /oc-help in any issue to see the full list of models."

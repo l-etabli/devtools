@@ -11,6 +11,7 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
+      id-token: write
     uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
     with:
       model: google/gemini-3-pro

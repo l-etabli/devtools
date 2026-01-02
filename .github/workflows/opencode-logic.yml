@@ -58,9 +58,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
+      - name: Determine Mode
+        id: mode
+        run: |
+          COMMENT=$(echo "${{ inputs.comment }}" | tr '[:upper:]' '[:lower:]')
+          if [[ "$COMMENT" =~ (fix|implement|add|create|refactor|go ahead|looks good|proceed|approved|/oc-go) ]]; then
+            echo "instruction=DIRECT ACTION MODE: Proceed with implementation and PR." >> $GITHUB_OUTPUT
+          else
+            echo "instruction=PLANNING MODE: You are currently in the planning phase. Research the codebase and post your proposed plan as a comment on the issue. DO NOT create any branches or pull requests yet. Wait for explicit approval." >> $GITHUB_OUTPUT
+          fi
+
       - name: Run OpenCode
         uses: sst/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          OPENCODE_INSTRUCTIONS: ${{ steps.mode.outputs.instruction }}
         with:
           model: ${{ steps.parse.outputs.model }}

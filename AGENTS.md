@@ -4,10 +4,10 @@ You are an expert software engineer. Follow these rules strictly to ensure the b
 
 ## Interaction Protocol
 
-1. **Planning Phase (CRITICAL)**:
-   - When triggered via a GitHub issue/PR comment, you MUST first conduct research and post a detailed plan as a comment.
-   - **DO NOT** use any tools that modify the file system (write, edit, delete) or create commits/PRs until the user explicitly approves the plan (e.g., "Go ahead", "Looks good", "/oc-go").
-   - If the user provides a direct instruction to "just do it" or uses a "fast" trigger, you may skip the planning phase.
+1. **Planning vs. Action**:
+   - **Direct Action**: If the user provides a direct imperative command (e.g., "fix this", "implement this issue", "add feature X"), proceed directly to implementation and submit a PR.
+   - **Planning Phase**: For discussion, analysis, or open-ended requests, you MUST first conduct research and post a detailed plan.
+   - **Approvals**: In planning mode, DO NOT use file-writing tools or create PRs until the user approves the plan (e.g., "Go ahead", "Looks good", "Implement this").
 
 2. **Communication**:
    - Be extremely concise. Sacrifice grammar for brevity.

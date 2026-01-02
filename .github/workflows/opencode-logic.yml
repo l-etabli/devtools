@@ -50,7 +50,7 @@ jobs:
       - name: Fetch central agent rules
         run: |
           gh api /repos/l-etabli/devtools/contents/AGENTS.md -q .content | base64 -d > AGENTS.md.central
-          if [ -f AGENTS.md ]; then
+          if [ "${{ github.repository }}" != "l-etabli/devtools" ] && [ -f AGENTS.md ]; then
             echo -e "\n\n# Project Specific Rules\n" >> AGENTS.md.central
             cat AGENTS.md >> AGENTS.md.central
           fi
@@ -62,7 +62,7 @@ jobs:
         id: mode
         run: |
           COMMENT=$(echo "${{ inputs.comment }}" | tr '[:upper:]' '[:lower:]')
-          if [[ "$COMMENT" =~ (fix|implement|add|create|refactor|go ahead|looks good|proceed|approved|/oc-go) ]]; then
+          if [[ "$COMMENT" =~ (go ahead|looks good|proceed|approved|/oc-go|lgtm|do it) ]]; then
             echo "instruction=DIRECT ACTION MODE: Proceed with implementation and PR." >> $GITHUB_OUTPUT
           else
             echo "instruction=PLANNING MODE: You are currently in the planning phase. Research the codebase and post your proposed plan as a comment on the issue. DO NOT create any branches or pull requests yet. Wait for explicit approval." >> $GITHUB_OUTPUT

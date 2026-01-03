@@ -87,14 +87,24 @@ jobs:
             -H "Content-Type: application/json" \
             -d "{\"model\": \"gemini-3-flash\", \"messages\": [{\"role\": \"user\", \"content\": $(echo "$PROMPT" | jq -Rs .)}]}")
           
-          MODE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content' | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+          echo "API Response: $RESPONSE"
           
-          # Validate
-          [[ "$MODE" != "plan" && "$MODE" != "implement" && "$MODE" != "review" ]] && MODE="plan"
-          [[ "$MODE" == "review" && "$IS_PR" != "true" ]] && MODE="plan"
+          MODE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty' | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+          
+          echo "Parsed MODE: $MODE"
+          
+          # Validate and fallback
+          if [[ "$MODE" != "plan" && "$MODE" != "implement" && "$MODE" != "review" ]]; then
+            echo "Invalid mode '$MODE', falling back to plan"
+            MODE="plan"
+          fi
+          if [[ "$MODE" == "review" && "$IS_PR" != "true" ]]; then
+            echo "Review mode not valid for issues, falling back to plan"
+            MODE="plan"
+          fi
           
           echo "mode=$MODE" >> $GITHUB_OUTPUT
-          echo "Detected mode: $MODE"
+          echo "Final mode: $MODE"
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
 

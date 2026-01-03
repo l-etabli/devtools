@@ -74,6 +74,7 @@ jobs:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
         with:
           model: ${{ steps.parse.outputs.model }}
+          token: ${{ github.token }}
           prompt: |
             Review this issue/comment. Analyze the codebase and provide a detailed plan.
             Do NOT create branches or PRs - only respond with a comment explaining your analysis and proposed solution.

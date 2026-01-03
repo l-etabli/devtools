@@ -22,13 +22,31 @@ jobs:
     # Permissions are inherited from the calling workflow
 
     steps:
-      - name: Parse model from comment
+      - name: Acknowledge comment
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request_review_comment" ]; then
+            ENDPOINT="/repos/${{ github.repository }}/pulls/comments/${{ github.event.comment.id }}/reactions"
+          else
+            ENDPOINT="/repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions"
+          fi
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            $ENDPOINT \
+            -f "content=eyes" || echo "Failed to add reaction"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Parse model and mode from comment
         id: parse
         run: |
           COMMENT="${{ inputs.comment }}"
           MODEL=""
+          MODE="plan"
+          IS_PR="${{ github.event.issue.pull_request != null || github.event.pull_request != null }}"
 
-          # Model mapping - add new models here
+          # Model mapping
           if [[ "$COMMENT" == *"/oc-opus-4-5"* ]]; then
             MODEL="opencode/claude-opus-4-5"
           elif [[ "$COMMENT" == *"/oc-gemini-3-pro"* ]]; then
@@ -38,15 +56,53 @@ jobs:
           fi
 
           if [ -z "$MODEL" ]; then
-            echo "::error::No matching model found in comment. Use: /oc-gemini-3-flash, /oc-gemini-3-pro, or /oc-opus-4-5"
+            echo "::error::No matching model found in comment."
             exit 1
           fi
 
+          # Mode Triage
+          if [[ "$COMMENT" == *"implement"* ]] || [[ "$COMMENT" == *"@l-etabli/oc-implement"* ]]; then
+            MODE="implement"
+          elif [ "$IS_PR" = "true" ]; then
+            MODE="review"
+          fi
+
           echo "model=$MODEL" >> $GITHUB_OUTPUT
+          echo "mode=$MODE" >> $GITHUB_OUTPUT
           echo "Selected model: $MODEL"
+          echo "Selected mode: $MODE"
 
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Set up Git identity
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Mark related PR comments
+        if: steps.parse.outputs.mode == 'review'
+        run: |
+          PR_NUMBER=${{ github.event.issue.number || github.event.pull_request.number }}
+          AGENT_HANDLE="@l-etabli/oc-"
+          
+          # Mark issue/general comments
+          ISSUE_COMMENTS=$(gh api repos/${{ github.repository }}/issues/$PR_NUMBER/comments --paginate -q ".[] | select(.body | contains(\"$AGENT_HANDLE\")) | .id")
+          for ID in $ISSUE_COMMENTS; do
+            if [ "$ID" != "${{ github.event.comment.id }}" ] || [ "${{ github.event_name }}" != "issue_comment" ]; then
+              gh api --method POST -H "Accept: application/vnd.github+json" /repos/${{ github.repository }}/issues/comments/$ID/reactions -f "content=eyes" || true
+            fi
+          done
+
+          # Mark PR diff comments
+          DIFF_COMMENTS=$(gh api repos/${{ github.repository }}/pulls/$PR_NUMBER/comments --paginate -q ".[] | select(.body | contains(\"$AGENT_HANDLE\")) | .id")
+          for ID in $DIFF_COMMENTS; do
+            if [ "$ID" != "${{ github.event.comment.id }}" ] || [ "${{ github.event_name }}" != "pull_request_review_comment" ]; then
+              gh api --method POST -H "Accept: application/vnd.github+json" /repos/${{ github.repository }}/pulls/comments/$ID/reactions -f "content=eyes" || true
+            fi
+          done
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Fetch central agent rules
         run: |
@@ -67,8 +123,9 @@ jobs:
         with:
           model: ${{ steps.parse.outputs.model }}
           prompt: |
+            MODE: ${{ steps.parse.outputs.mode }}
             USER REQUEST:
             ${{ inputs.comment }}
 
             INSTRUCTIONS:
-            ${{ inputs.prompt || 'Fulfill the USER REQUEST above with HIGHEST PRIORITY. Implement the requested changes following project conventions.' }}
+            ${{ inputs.prompt || 'Fulfill the USER REQUEST above with HIGHEST PRIORITY. Follow the rules in AGENTS.md for the selected MODE.' }}

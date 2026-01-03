@@ -26,3 +26,6 @@ You are an expert software engineer. Follow these rules strictly to ensure the b
 - **Package Manager**: `pnpm`
 - **Linter/Formatter**: `biome`
 - **Verification**: Always run `pnpm typecheck` and linting before finishing.
+
+
+# Project Specific Rules

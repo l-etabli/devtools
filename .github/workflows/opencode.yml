@@ -26,7 +26,7 @@ jobs:
     needs: triage
     if: needs.triage.outputs.mode == 'plan'
     permissions:
-      contents: write
+      contents: read
       issues: write
       pull-requests: write
       id-token: write

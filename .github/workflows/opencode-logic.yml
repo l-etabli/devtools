@@ -83,7 +83,7 @@ jobs:
           Respond with ONLY one word."
 
           # Try multiple free models in order (no separate API key needed)
-          for MODEL in "grok-code-fast-1" "minimax-m2.1" "big-pickle" "glm-4.7"; do
+          for MODEL in "grok-code" "minimax-m2.1-free" "big-pickle" "glm-4.7-free"; do
             echo "Trying model: $MODEL"
             RESPONSE=$(curl -s "https://opencode.ai/zen/v1/chat/completions" \
               -H "Authorization: Bearer $OPENCODE_API_KEY" \
@@ -103,6 +103,12 @@ jobs:
               break
             fi
           done
+          
+          # Fail if all models failed
+          if [[ -z "$MODE" ]]; then
+            echo "::error::All triage models failed"
+            exit 1
+          fi
           
           echo "Parsed MODE: $MODE"
           

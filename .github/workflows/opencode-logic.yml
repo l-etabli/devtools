@@ -88,7 +88,12 @@ jobs:
             -H "Content-Type: application/json" \
             -d "{\"model\": \"glm-4.7-free\", \"messages\": [{\"role\": \"user\", \"content\": $(echo "$PROMPT" | jq -Rs .)}]}")
           
-          echo "API Response: $RESPONSE"
+          # Check for API error
+          if echo "$RESPONSE" | jq -e '.type == "error"' > /dev/null 2>&1; then
+            ERROR_MSG=$(echo "$RESPONSE" | jq -r '.error.message // "Unknown error"')
+            echo "::error::Triage API error: $ERROR_MSG"
+            exit 1
+          fi
           
           MODE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty' | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
           

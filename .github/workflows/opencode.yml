@@ -79,8 +79,13 @@ jobs:
           agent: plan
           use_github_token: true
           prompt: |
-            Review this issue/comment. Analyze the codebase and provide a detailed plan.
-            Do NOT create branches or PRs - only respond with a comment explaining your analysis and proposed solution.
+            USER REQUEST:
+            ${{ github.event.comment.body }}
+
+            INSTRUCTIONS:
+            1. Fulfill the USER REQUEST above with HIGHEST PRIORITY.
+            2. Analyze the codebase and context to provide a detailed plan.
+            3. Do NOT implement yet - respond only with the plan.
 
   implement:
     needs: triage

@@ -38,13 +38,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - name: Parse model and mode from comment
-        id: parse
+      - name: Parse model from comment
+        id: parse-model
         run: |
           COMMENT="${{ inputs.comment }}"
           MODEL=""
-          MODE="plan"
-          IS_PR="${{ github.event.issue.pull_request != null || github.event.pull_request != null }}"
 
           # Model mapping
           if [[ "$COMMENT" == *"/oc-opus-4-5"* ]]; then
@@ -60,20 +58,45 @@ jobs:
             exit 1
           fi
 
-          # Mode Triage
-          if [[ "$COMMENT" == *"implement"* ]] || [[ "$COMMENT" == *"@l-etabli/oc-implement"* ]]; then
-            MODE="implement"
-          elif [ "$IS_PR" = "true" ]; then
-            MODE="review"
-          fi
-
           echo "model=$MODEL" >> $GITHUB_OUTPUT
-          echo "mode=$MODE" >> $GITHUB_OUTPUT
           echo "Selected model: $MODEL"
-          echo "Selected mode: $MODE"
 
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Triage mode with LLM
+        id: triage
+        run: |
+          IS_PR="${{ github.event.issue.pull_request != null || github.event.pull_request != null }}"
+          CONTEXT=$([[ "$IS_PR" == "true" ]] && echo "PR comment" || echo "Issue comment")
+          
+          PROMPT="You are a triage assistant. Respond with ONLY one word: plan, implement, or review.
+
+          CONTEXT: ${CONTEXT}
+          COMMENT: ${{ inputs.comment }}
+
+          MODES:
+          - plan: Analysis, research, or planning. Use when unclear.
+          - implement: User explicitly wants code changes now.
+          - review: Feedback on PR code (only for PR comments).
+
+          Respond with ONLY one word."
+
+          RESPONSE=$(curl -s "https://opencode.ai/zen/v1/chat/completions" \
+            -H "Authorization: Bearer $OPENCODE_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"model\": \"gemini-3-flash\", \"messages\": [{\"role\": \"user\", \"content\": $(echo "$PROMPT" | jq -Rs .)}]}")
+          
+          MODE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content' | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+          
+          # Validate
+          [[ "$MODE" != "plan" && "$MODE" != "implement" && "$MODE" != "review" ]] && MODE="plan"
+          [[ "$MODE" == "review" && "$IS_PR" != "true" ]] && MODE="plan"
+          
+          echo "mode=$MODE" >> $GITHUB_OUTPUT
+          echo "Detected mode: $MODE"
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
 
       - name: Set up Git identity
         run: |
@@ -81,7 +104,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
 
       - name: Mark related PR comments
-        if: steps.parse.outputs.mode == 'review'
+        if: steps.triage.outputs.mode == 'review'
         run: |
           PR_NUMBER=${{ github.event.issue.number || github.event.pull_request.number }}
           AGENT_HANDLE="@l-etabli/oc-"
@@ -122,10 +145,10 @@ jobs:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          model: ${{ steps.parse.outputs.model }}
+          model: ${{ steps.parse-model.outputs.model }}
           use_github_token: true
           prompt: |
-            MODE: ${{ steps.parse.outputs.mode }}
+            MODE: ${{ steps.triage.outputs.mode }}
             USER REQUEST:
             ${{ inputs.comment }}
 

@@ -82,10 +82,11 @@ jobs:
 
           Respond with ONLY one word."
 
+          # Use GLM 4.7 (free model that works with chat/completions endpoint)
           RESPONSE=$(curl -s "https://opencode.ai/zen/v1/chat/completions" \
             -H "Authorization: Bearer $OPENCODE_API_KEY" \
             -H "Content-Type: application/json" \
-            -d "{\"model\": \"gemini-3-flash\", \"messages\": [{\"role\": \"user\", \"content\": $(echo "$PROMPT" | jq -Rs .)}]}")
+            -d "{\"model\": \"glm-4.7-free\", \"messages\": [{\"role\": \"user\", \"content\": $(echo "$PROMPT" | jq -Rs .)}]}")
           
           echo "API Response: $RESPONSE"
           

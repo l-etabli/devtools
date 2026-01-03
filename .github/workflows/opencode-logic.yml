@@ -143,18 +143,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - name: Fetch central agent rules
-        run: |
-          gh api /repos/l-etabli/devtools/contents/AGENTS.md -q .content | base64 -d > AGENTS.md.central
-          if [ -f AGENTS.md ]; then
-            echo -e "\n\n# Project Specific Rules\n" >> AGENTS.md.central
-            cat AGENTS.md >> AGENTS.md.central
-          fi
-          mv AGENTS.md.central AGENTS.md
-          git update-index --assume-unchanged AGENTS.md
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
       - name: Run OpenCode
         uses: sst/opencode/github@latest
         env:
@@ -168,5 +156,20 @@ jobs:
             USER REQUEST:
             ${{ inputs.comment }}
 
+            RULES:
+            - Be extremely concise. Sacrifice grammar for brevity.
+            - Functional programming over classes. Pure functions, immutable data.
+            - Long descriptive names over comments. Avoid comments unless explaining "why".
+            - Prefer named exports over default exports.
+            - TypeScript strict mode. No `any`. Unions over enums.
+            - Explicit error handling, no silent failures.
+            - Use pnpm, biome for linting/formatting.
+            - Run `pnpm typecheck` before finishing.
+
+            MODE BEHAVIOR:
+            - plan: Research and post a detailed plan as a comment. Do NOT create branches or PRs.
+            - implement: Proceed with implementation and submit a PR.
+            - review: Provide feedback on PR code.
+
             INSTRUCTIONS:
-            ${{ inputs.prompt || 'Fulfill the USER REQUEST above with HIGHEST PRIORITY. Follow the rules in AGENTS.md for the selected MODE.' }}
+            ${{ inputs.prompt || 'Fulfill the USER REQUEST with HIGHEST PRIORITY following the RULES and MODE BEHAVIOR above.' }}

@@ -66,4 +66,9 @@ jobs:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
         with:
           model: ${{ steps.parse.outputs.model }}
-          prompt: ${{ inputs.prompt }}
+          prompt: |
+            USER REQUEST:
+            ${{ inputs.comment }}
+
+            INSTRUCTIONS:
+            ${{ inputs.prompt || 'Fulfill the USER REQUEST above with HIGHEST PRIORITY. Implement the requested changes following project conventions.' }}

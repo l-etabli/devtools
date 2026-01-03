@@ -65,6 +65,7 @@ jobs:
             cat AGENTS.md >> AGENTS.md.central
           fi
           mv AGENTS.md.central AGENTS.md
+          git update-index --assume-unchanged AGENTS.md
         env:
           GITHUB_TOKEN: ${{ github.token }}
 

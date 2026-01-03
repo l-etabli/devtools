@@ -26,14 +26,16 @@ jobs:
     needs: triage
     if: needs.triage.outputs.agent == 'plan'
     permissions:
-      contents: read
+      contents: write
       issues: write
-      pull-requests: read
+      pull-requests: write
       id-token: write
     uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
     with:
       comment: ${{ github.event.comment.body }}
-      agent: plan
+      prompt: |
+        Review this issue/comment. Analyze the codebase and provide a detailed plan.
+        Do NOT create branches or PRs - only respond with a comment explaining your analysis and proposed solution.
     secrets:
       OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
 
@@ -48,6 +50,5 @@ jobs:
     uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
     with:
       comment: ${{ github.event.comment.body }}
-      agent: primary
     secrets:
       OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}

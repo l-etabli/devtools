@@ -11,35 +11,20 @@ jobs:
     if: contains(github.event.comment.body, '/oc-')
     runs-on: ubuntu-latest
     outputs:
-      agent: ${{ steps.mode.outputs.agent }}
+      mode: ${{ steps.detect.outputs.mode }}
     steps:
-      - id: mode
+      - id: detect
         run: |
-          COMMENT=$(echo "${{ github.event.comment.body }}" | tr '[:upper:]' '[:lower:]')
-          if [[ "$COMMENT" =~ (fix|implement|add|create|refactor|go ahead|looks good|proceed|approved|/oc-go) ]]; then
-            echo "agent=primary" >> $GITHUB_OUTPUT
+          COMMENT="${{ github.event.comment.body }}"
+          if [[ "$COMMENT" == *"@l-etabli/oc-implement"* ]]; then
+            echo "mode=implement" >> $GITHUB_OUTPUT
           else
-            echo "agent=plan" >> $GITHUB_OUTPUT
+            echo "mode=plan" >> $GITHUB_OUTPUT
           fi
 
   plan:
     needs: triage
-    if: needs.triage.outputs.agent == 'plan'
-    permissions:
-      contents: read
-      issues: write
-      pull-requests: read
-      id-token: write
-    uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
-    with:
-      comment: ${{ github.event.comment.body }}
-      agent: plan
-    secrets:
-      OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
-
-  implement:
-    needs: triage
-    if: needs.triage.outputs.agent == 'primary'
+    if: needs.triage.outputs.mode == 'plan'
     permissions:
       contents: write
       issues: write
@@ -48,6 +33,22 @@ jobs:
     uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
     with:
       comment: ${{ github.event.comment.body }}
-      agent: primary
+      prompt: |
+        Review this issue/comment. Analyze the codebase and provide a detailed plan.
+        Do NOT create branches or PRs - only respond with a comment explaining your analysis and proposed solution.
+    secrets:
+      OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+
+  implement:
+    needs: triage
+    if: needs.triage.outputs.mode == 'implement'
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+    uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
+    with:
+      comment: ${{ github.event.comment.body }}
     secrets:
       OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}

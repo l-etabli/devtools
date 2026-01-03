@@ -7,11 +7,11 @@ on:
         required: true
         type: string
         description: "The issue comment body containing the trigger keyword"
-      agent:
+      prompt:
         required: false
         type: string
         default: ""
-        description: "The agent to use (primary or plan). If not provided, it will be determined from the comment."
+        description: "Optional custom prompt to override the default behavior"
     secrets:
       OPENCODE_API_KEY:
         required: true
@@ -59,24 +59,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - name: Determine Agent
-        id: mode
-        run: |
-          if [ -n "${{ inputs.agent }}" ]; then
-            echo "agent=${{ inputs.agent }}" >> $GITHUB_OUTPUT
-          else
-            COMMENT=$(echo "${{ inputs.comment }}" | tr '[:upper:]' '[:lower:]')
-            if [[ "$COMMENT" =~ (fix|implement|add|create|refactor|go ahead|looks good|proceed|approved|/oc-go) ]]; then
-              echo "agent=primary" >> $GITHUB_OUTPUT
-            else
-              echo "agent=plan" >> $GITHUB_OUTPUT
-            fi
-          fi
-
       - name: Run OpenCode
         uses: sst/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
         with:
           model: ${{ steps.parse.outputs.model }}
-          agent: ${{ steps.mode.outputs.agent }}
+          prompt: ${{ inputs.prompt }}

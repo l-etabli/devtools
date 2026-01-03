@@ -5,8 +5,39 @@ on:
     types: [created]
 
 jobs:
-  run:
+  triage:
     if: contains(github.event.comment.body, '/oc-')
+    runs-on: ubuntu-latest
+    outputs:
+      agent: ${{ steps.mode.outputs.agent }}
+    steps:
+      - id: mode
+        run: |
+          COMMENT=$(echo "${{ github.event.comment.body }}" | tr '[:upper:]' '[:lower:]')
+          if [[ "$COMMENT" =~ (fix|implement|add|create|refactor|go ahead|looks good|proceed|approved|/oc-go) ]]; then
+            echo "agent=primary" >> $GITHUB_OUTPUT
+          else
+            echo "agent=plan" >> $GITHUB_OUTPUT
+          fi
+
+  plan:
+    needs: triage
+    if: needs.triage.outputs.agent == 'plan'
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+      id-token: write
+    uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
+    with:
+      comment: ${{ github.event.comment.body }}
+      agent: plan
+    secrets:
+      OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+
+  implement:
+    needs: triage
+    if: needs.triage.outputs.agent == 'primary'
     permissions:
       contents: write
       issues: write
@@ -15,5 +46,6 @@ jobs:
     uses: l-etabli/devtools/.github/workflows/opencode-logic.yml@main
     with:
       comment: ${{ github.event.comment.body }}
+      agent: primary
     secrets:
       OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}

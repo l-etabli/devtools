@@ -82,20 +82,27 @@ jobs:
 
           Respond with ONLY one word."
 
-          # Use GLM 4.7 (free model that works with chat/completions endpoint)
-          RESPONSE=$(curl -s "https://opencode.ai/zen/v1/chat/completions" \
-            -H "Authorization: Bearer $OPENCODE_API_KEY" \
-            -H "Content-Type: application/json" \
-            -d "{\"model\": \"glm-4.7-free\", \"messages\": [{\"role\": \"user\", \"content\": $(echo "$PROMPT" | jq -Rs .)}]}")
-          
-          # Check for API error
-          if echo "$RESPONSE" | jq -e '.type == "error"' > /dev/null 2>&1; then
-            ERROR_MSG=$(echo "$RESPONSE" | jq -r '.error.message // "Unknown error"')
-            echo "::error::Triage API error: $ERROR_MSG"
-            exit 1
-          fi
-          
-          MODE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty' | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+          # Try multiple free models in order (no separate API key needed)
+          for MODEL in "grok-code-fast-1" "minimax-m2.1" "big-pickle" "glm-4.7"; do
+            echo "Trying model: $MODEL"
+            RESPONSE=$(curl -s "https://opencode.ai/zen/v1/chat/completions" \
+              -H "Authorization: Bearer $OPENCODE_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d "{\"model\": \"$MODEL\", \"messages\": [{\"role\": \"user\", \"content\": $(echo "$PROMPT" | jq -Rs .)}]}")
+            
+            # Check for API error
+            if echo "$RESPONSE" | jq -e '.type == "error"' > /dev/null 2>&1; then
+              ERROR_MSG=$(echo "$RESPONSE" | jq -r '.error.message // "Unknown error"')
+              echo "Model $MODEL failed: $ERROR_MSG"
+              continue
+            fi
+            
+            MODE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty' | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+            if [[ -n "$MODE" ]]; then
+              echo "Model $MODEL succeeded"
+              break
+            fi
+          done
           
           echo "Parsed MODE: $MODE"
           

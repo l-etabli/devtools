@@ -19,11 +19,7 @@ on:
 jobs:
   run-agent:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      issues: write
-      id-token: write
+    # Permissions are inherited from the calling workflow
 
     steps:
       - name: Parse model from comment

@@ -28,7 +28,7 @@ jobs:
           MODEL=""
 
           # Model mapping - add new models here
-          if [[ "$COMMENT" == *"/oc-opus-4.5"* ]]; then
+          if [[ "$COMMENT" == *"/oc-opus-4-5"* ]]; then
             MODEL="opencode/claude-opus-4-5"
           elif [[ "$COMMENT" == *"/oc-gemini-3-pro"* ]]; then
             MODEL="opencode/gemini-3-pro"
@@ -37,7 +37,7 @@ jobs:
           fi
 
           if [ -z "$MODEL" ]; then
-            echo "::error::No matching model found in comment. Use: /oc-gemini-3-flash, /oc-gemini-3-pro, or /oc-opus-4.5"
+            echo "::error::No matching model found in comment. Use: /oc-gemini-3-flash, /oc-gemini-3-pro, or /oc-opus-4-5"
             exit 1
           fi
 

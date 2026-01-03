@@ -48,14 +48,14 @@ Comment on any Issue or PR with a trigger keyword:
 | :--- | :--- | :--- |
 | `/oc-gemini-3-flash` | Gemini 3 Flash | Quick tasks, docs, typos |
 | `/oc-gemini-3-pro` | Gemini 3 Pro | Standard features, daily coding |
-| `/oc-opus-4.5` | Claude Opus 4.5 | Complex architecture, deep reasoning |
+| `/oc-opus-4-5` | Claude Opus 4.5 | Complex architecture, deep reasoning |
 
 ### Examples
 
 ```
 /oc-gemini-3-flash Add error handling to this function
 /oc-gemini-3-pro Write tests for the auth module
-/oc-opus-4.5 Refactor this service using the Repository pattern
+/oc-opus-4-5 Refactor this service using the Repository pattern
 ```
 
 ## Adding a New Model
